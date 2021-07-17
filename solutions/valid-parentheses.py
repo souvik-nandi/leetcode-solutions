@@ -43,3 +43,28 @@ s consists of parentheses only '()[]{}'.
 
 '''
 
+class Solution:
+    def isValid(self, s: str) -> bool:
+        stack = []
+        
+        brackets_map = { '(': ')', '{': '}', '[': ']' }
+        opening_brackets = set(brackets_map.keys())
+        isvalid = True
+        
+        for b in s:
+            if b in opening_brackets:
+                stack.append(b)
+            else:
+                if len(stack) == 0:
+                    isvalid = False
+                    break
+                    
+                o = stack.pop()
+                if brackets_map[o] != b:
+                    isvalid = False
+                    break
+
+            
+        return len(stack) == 0 and isvalid
+
+        
