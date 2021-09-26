@@ -51,42 +51,84 @@ So we will add two more checks
 '''
 
 
+'''
+    Most fastest solution for 3 sum
+'''
 from typing import List
+from bisect import bisect_left
+import collections
 
 class Solution:
     def threeSum(self, nums: List[int]) -> List[List[int]]:
-        n = len(nums)
-        
-        if n < 3:
+        if len(nums) < 3:
             return []
         
-        triplets = []
-        nums = sorted(nums)
+        counter = collections.defaultdict(int)
+        for i in nums:
+            counter[i] += 1
+        nums = sorted(counter)
         
-        for i in range(n-2):
-            # Never let i refer to the same value twice to avoid duplicates.
-            if (i != 0 and nums[i] == nums[i - 1]): continue;
-            i_val = nums[i]
-            j = i + 1
-            k = n - 1
-            
-            # Two pointer search starts
-            while j < k:
-                j_val = nums[j]
-                k_val = nums[k]
-                
-                tot = i_val + j_val + k_val
-                
-                if tot == 0:
-                    triplets.append([i_val, j_val, k_val])
-                    j += 1
-                    # Never let j refer to the same value twice (in an output) to avoid duplicates.
-                    while (j < k and nums[j] == nums[j-1]): j += 1;
-                elif tot < 0:
-                    j += 1
-                else:
-                    k -= 1
+        if nums[0] > 0 or nums[-1] < 0:
+            return []
         
-        return triplets
+        output = []
+
+        for i in range(len(nums) - 2):
+            i_item = nums[i]
+            twoSum = -i_item
+            min_half, max_half = twoSum - nums[-1], twoSum / 2
+            l = bisect_left(nums, min_half, i+1)
+            r = bisect_left(nums, max_half, l)
+
+            for j_item in nums[l:r]:                
+                k_item = twoSum - j_item
+                
+                if k_item in counter:
+                    output.append([i_item, j_item, k_item])
+
+        for k in counter:
+            if counter[k] > 1:
+                if k == 0 and counter[k] >= 3:
+                    output.append([0,0,0])
+                elif k != 0 and -2*k in counter:
+                    output.append([k, k, -2*k])
+        return output
             
-                    
+'''
+    Most generalized solution using kSum
+'''
+
+class Solution:
+    def twoSum(self, nums, target):
+        l, r = 0, len(nums) - 1
+        combs = []
+        while l < r:
+            tot = nums[l] + nums[r]
+
+            if tot < target or (l > 0 and nums[l] == nums[l-1]):
+                l += 1
+            elif tot > target or (r < len(nums) - 1 and nums[r] == nums[r+1]):
+                r -= 1
+            else:
+                combs.append([nums[l], nums[r]])
+                l += 1
+                r -= 1
+
+        return combs
+    
+    def kSum(self, nums, target, k):
+        if len(nums) < k or sum(nums[0:k]) > target or sum(nums[-k:]) < target:
+            return []
+        if k == 2:
+            return self.twoSum(nums, target)
+        combs = []
+        
+        for i in range(len(nums) - k + 1):
+            if i == 0 or nums[i] != nums[i-1]:
+                for item in self.kSum(nums[i+1:], target - nums[i], k - 1):
+                    combs.append([nums[i]] + item)
+        
+        return combs
+        
+    def threeSum(self, nums: List[int]) -> List[List[int]]:
+        return self.kSum(sorted(nums), 0, 3)

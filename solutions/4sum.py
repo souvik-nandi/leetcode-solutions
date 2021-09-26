@@ -106,33 +106,36 @@ Faster recursive solution for variable size of combination
 '''
 
 class Solution:
+    def twoSum(self, nums, target):
+        l, r = 0, len(nums) - 1
+        combs = []
+        while l < r:
+            tot = nums[l] + nums[r]
+
+            if tot < target or (l > 0 and nums[l] == nums[l-1]):
+                l += 1
+            elif tot > target or (r < len(nums) - 1 and nums[r] == nums[r+1]):
+                r -= 1
+            else:
+                combs.append([nums[l], nums[r]])
+                l += 1
+                r -= 1
+
+        return combs
+    
+    def kSum(self, nums, target, k):
+        if len(nums) < k or sum(nums[0:k]) > target or sum(nums[-k:]) < target:
+            return []
+        if k == 2:
+            return self.twoSum(nums, target)
+        combs = []
+        
+        for i in range(len(nums) - k + 1):
+            if i == 0 or nums[i] != nums[i-1]:
+                for item in self.kSum(nums[i+1:], target - nums[i], k - 1):
+                    combs.append([nums[i]] + item)
+        
+        return combs
+        
     def fourSum(self, nums: List[int], target: int) -> List[List[int]]:
-        def kSum(nums: List[int], target: int, k: int) -> List[List[int]]:
-            res = []
-            if len(nums) == 0 or nums[0] * k > target or target > nums[-1] * k:
-                return res
-            if k == 2:
-                return twoSum(nums, target)
-            for i in range(len(nums)):
-                if i == 0 or nums[i - 1] != nums[i]:
-                    for _, set in enumerate(kSum(nums[i + 1:], target - nums[i], k - 1)):
-                        res.append([nums[i]] + set)
-            return res
-
-        def twoSum(nums: List[int], target: int) -> List[List[int]]:
-            res = []
-            lo, hi = 0, len(nums) - 1
-            while (lo < hi):
-                sum = nums[lo] + nums[hi]
-                if sum < target or (lo > 0 and nums[lo] == nums[lo - 1]):
-                    lo += 1
-                elif sum > target or (hi < len(nums) - 1 and nums[hi] == nums[hi + 1]):
-                    hi -= 1
-                else:
-                    res.append([nums[lo], nums[hi]])
-                    lo += 1
-                    hi -= 1
-            return res
-
-        nums.sort()
-        return kSum(nums, target, 4)
+        return self.kSum(sorted(nums), target, 4)

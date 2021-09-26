@@ -1,5 +1,4 @@
 '''
-
 Problem Statement: Rotate Image
 
 Link: https://leetcode.com/problems/rotate-image
@@ -34,8 +33,51 @@ matrix.length == n
 matrix[i].length == n
 1 <= n <= 20
 -1000 <= matrix[i][j] <= 1000
-
-
-
 '''
 
+from typing import List
+
+
+class Solution:
+    def rotate(self, matrix: List[List[int]]) -> None:
+        """
+        Do not return anything, modify matrix in-place instead.
+        """
+        def printmat(mat):
+            for row in mat:
+                print(row)
+            print()
+
+        n = len(matrix)
+        
+        for i in range(0, n // 2):
+            coords = [
+                (i, i), 
+                (i, n - i - 1), 
+                (n - i - 1, n - i - 1), 
+                (n - i - 1, i)
+            ]
+            
+            for j in range(i, n - i - 1):
+                last_val = [
+                    matrix[coords[0][0]][coords[0][1]], 
+                    matrix[coords[1][0]][coords[1][1]], 
+                    matrix[coords[2][0]][coords[2][1]], 
+                    matrix[coords[3][0]][coords[3][1]]
+                ]
+                
+                for k in range(0, 4):
+                    a2, b2 = coords[(k + 1) % 4]
+                    matrix[a2][b2] = last_val[k]
+                
+                for k in range(0, 4):
+                    a, b = coords[k]
+                    
+                    if k == 0:
+                        coords[k] = a, b + 1
+                    elif k == 1:
+                        coords[k] = a + 1, b
+                    elif k == 2:
+                        coords[k] = a, b - 1
+                    else:
+                        coords[k] = a - 1, b

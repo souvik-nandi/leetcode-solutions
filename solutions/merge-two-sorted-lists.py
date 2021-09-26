@@ -32,3 +32,39 @@ Both l1 and l2 are sorted in non-decreasing order.
 
 '''
 
+# Definition for singly-linked list.
+class ListNode:
+    def __init__(self, val=0, next=None):
+        self.val = val
+        self.next = next
+
+class Solution:
+    def mergeTwoLists(self, l1: ListNode, l2: ListNode) -> ListNode:
+        head = ListNode()
+        curNode = head
+        
+        while True:
+            if l1 and l2:
+                if (l1.val <= l2.val):
+                    newNode = ListNode(l1.val)
+                    l1 = l1.next
+                else:
+                    newNode = ListNode(l2.val)
+                    l2 = l2.next
+                    
+                curNode.next = newNode
+                curNode = newNode
+            elif l1:
+                newNode = ListNode(l1.val)
+                curNode.next = newNode
+                curNode = newNode
+                l1 = l1.next
+            elif l2:
+                newNode = ListNode(l2.val)
+                curNode.next = newNode
+                curNode = newNode
+                l2 = l2.next
+            else:
+                break
+            
+        return head.next
